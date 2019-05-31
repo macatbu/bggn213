@@ -1,0 +1,53 @@
+---
+title: "Margaret_Burns_HW_Class06"
+output: html_document
+---
+
+Install relevant packages needed and load the data for my function 
+
+```{r setup, echo=TRUE}
+
+#install.packages("bio3d", dependencies=TRUE)
+
+library(bio3d)
+
+```
+
+
+Input of my function is three PDB protein codes for the proteins that you want to compare, also the chain name of interest, as well as the atom name of interest and then compare the B factor between them
+
+Output of my function is a plot of each of the input proteins 
+
+Defining my function below:
+
+```{r function, echo = TRUE }
+
+my_function <- function(protein_name, chain_name, atom_name) {
+  
+  # first the function calls in the PDB database for the protein of interest
+  s1 <- read.pdb(protein_name) 
+
+  # then we trim down the large PDB file for just the chain of the protein that
+  # we are interested in analyzing 
+  s1.chainx <- trim.pdb(s1, chain = chain_name, elety=atom_name)
+  
+  # from this chain we pull out the b factor which we want to compare
+  s1.b <- s1.chainx$atom$b
+
+  # plot our region of interest
+  return(plotb3(s1.b, sse=s1.chainx, typ="l", ylab="Bfactor"))
+}
+
+
+```
+
+Practice by callin the function for "4AKE"
+
+```{r plotting, echo=TRUE}
+
+my_function("4AKE", "A", "CA")
+my_function("1AKE", "A", "CA")
+my_function("1E4Y", "A", "CA")
+```
+
+

@@ -1,0 +1,206 @@
+---
+title: "In class practice"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Q1)
+
+Downloaded a CSV file from http://www.rcsb.org/stats/summary on 05-08-2019.
+
+Download a CSV file from the PDB site (accessible from “Analyze” -> “PDB Statistics” >
+“by Experimental Method and Molecular Type”. Move this CSV file into your RStudio project
+and determine the percentage of structures solved by X-Ray and Electron Microscopy. Also can
+you determine what proportion of structures are protein? 
+
+```{r}
+
+data <- read.csv("Data Export Summary.csv", row.names = 1)
+
+
+
+calculate <- sum(data$Proteins) / (sum(data$Total))
+calculate
+
+sum(data$Proteins)
+sum(data$Total)
+```
+
+Section 3
+Let's read the PDB file we downloaded into R to see how things live in this space
+
+```{r}
+library(bio3d)
+
+pdb <- read.pdb("1hsg.pdb")
+pdb
+
+#aa321(pdb$seqres)
+
+
+
+```
+
+```{r}
+
+pdb$atom
+
+```
+
+Section 4
+
+```{r}
+# Select all C-alpha atoms (return their indices)
+ca.inds <- atom.select(pdb, "calpha")
+ca.inds
+```
+
+
+Select residue number 10
+```{r}
+inds <- atom.select(pdb, resno = 10)
+
+inds
+```
+
+
+save a protein only pdb file 
+```{r}
+
+indicies_to_save <- atom.select(pdb, 'protein', value=TRUE)
+indicies_to_save
+write.pdb(indicies_to_save, file = "1HSG_PROTEIN.pdb") 
+
+```
+
+
+save a ligand/drug file
+```{r}
+
+ligand_inds <- atom.select(pdb, 'ligand', value=TRUE) 
+write.pdb(ligand_inds, file = "1HSE_LIGAND.pdb") 
+
+```
+
+
+install.packages("devtools")
+install.packages("rgl")
+
+devtools::install_bitbucket("Grantlab/bio3d-view")
+
+library("bio3d.view")
+```{r}
+
+
+library("bio3d.view")
+view(pdb, "overview", col="sse")
+
+```
+
+```{r}
+pdb <- read.pdb("1hel")
+# Normal mode analysis calculation
+modes <- nma(pdb)
+m7 <- mktrj(modes,
+ mode=7,
+ file="mode_7.pdb")
+view(m7, col=vec2color( rmsf(m7) ))
+```
+
+
+Before delving into more advanced analysis (detailed in the next section and additional
+vignettes) lets examine how we can read multiple PDB structures from the RCSB PDB for a
+particular protein and perform some basic analysis:
+```{r}
+# Download some example PDB files
+ids <- c("1TND_B","1AGR_A","1TAG_A","1GG2_A","1KJY_A","4G5Q_A")
+files <- get.pdb(ids, split = TRUE)
+
+
+
+```
+
+```{r}
+# Extract and align the chains we are interested in
+pdbs <- pdbaln(files, fit = TRUE)
+# Print to screen a summary of the 'pdbs' object
+pdbs
+```
+
+```{r}
+# Access the first 5 rows, and 8 columns
+pdbs$ali[1:5, 1:8]
+## [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8]
+## ./split_chain/1TND_B.pdb "-" "-" "-" "-" "-" "-" "-" "-"
+## ./split_chain/1AGR_A.pdb "L" "S" "A" "E" "D" "K" "A" "A"
+## ./split_chain/1TAG_A.pdb "-" "-" "-" "-" "-" "-" "-" "-"
+## ./split_chain/1GG2_A.pdb "L" "S" "A" "E" "D" "K" "A" "A"
+## ./split_chain/1KJY_A.pdb "-" "-" "-" "-" "-" "-" "-" "-"
+# Associated residues numbers
+pdbs$resno[1:5, 1:8]
+## [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8]
+## ./split_chain/1TND_B.pdb NA NA NA NA NA NA NA NA
+## ./split_chain/1AGR_A.pdb 5 6 7 8 9 10 11 12
+## ./split_chain/1TAG_A.pdb NA NA NA NA NA NA NA NA
+## ./split_chain/1GG2_A.pdb 5 6 7 8 9 10 11 12
+## ./split_chain/1KJY_A.pdb NA NA NA NA NA NA NA NA
+```
+
+```{r}
+# Calculate sequence identity
+seqidentity(pdbs)
+## 1TND_B 1AGR_A 1TAG_A 1GG2_A 1KJY_A 4G5Q_A
+## 1TND_B 1.000 0.693 1.000 0.690 0.696 0.696
+## 1AGR_A 0.693 1.000 0.694 0.997 0.994 0.997
+## 1TAG_A 1.000 0.694 1.000 0.691 0.697 0.697
+## 1GG2_A 0.690 0.997 0.691 1.000 0.991 0.994
+## 1KJY_A 0.696 0.994 0.697 0.991 1.000 1.000
+## 4G5Q_A 0.696 0.997 0.697 0.994 1.000 1.000
+# Calculate RMSD
+rmsd(pdbs)
+## 1TND_B 1AGR_A 1TAG_A 1GG2_A 1KJY_A 4G5Q_A
+## 1TND_B 0.000 1.042 1.281 1.651 2.098 2.367
+## 1AGR_A 1.042 0.000 1.628 1.811 1.949 2.244
+## 1TAG_A 1.281 1.628 0.000 1.730 1.840 1.885
+## 1GG2_A 1.651 1.811 1.730 0.000 1.901 2.032
+## 1KJY_A 2.098 1.949 1.840 1.901 0.000 1.225
+## 4G5Q_A 2.367 2.244 1.885 2.032 1.225 0.000
+```
+
+```{r}
+# Calculate RMSD
+rd <- rmsd(pdbs)
+# Clustering
+hc <- hclust(as.dist(rd))
+grps <- cutree(hc, k=3)
+# Plot results as dendrogram
+hclustplot(hc, k=3)
+```
+
+```{r}
+view(pdbs)
+
+pca.xray <- pca(pdbs)
+
+plot(pca.xray)
+```
+
+```{r}
+pc1 <- mktrj(pca.xray, pc=1, file="pc_1.pdb")
+```
+
+```{r}
+library(bio3d.view)
+# Structural displacements captured by PC1
+view(pc1)
+# The rglwidget() function from the rgl
+# package will show output in your Rmd
+# notebook and rendered html_output
+# documents
+library(rgl)
+rglwidget(pc1)
+```
+

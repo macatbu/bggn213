@@ -1,0 +1,101 @@
+---
+title: "Untitled"
+output: html_document
+---
+
+```{r }
+tmp <- c(rnorm(30,-3), rnorm(30,3))
+x <- cbind(x=tmp, y=rev(tmp))
+plot(x)
+
+
+res <- kmeans(tmp, 2, nstart=20)
+res$centers
+res$cluster
+
+plot(tmp(res$cluster, res$cluster, colors = c("red","blue)")
+```
+
+ What ‘component’ of your result object details
+ - cluster size?
+ - cluster assignment/membership?
+ - cluster center?
+
+
+```{r }
+
+res$size
+
+res$cluster
+
+res$centers
+
+table(res$cluster)
+
+
+
+
+
+```
+
+
+
+```{r}
+plot(x, col = res$cluster)
+points(res$centers, col="blue", pch = 18, cex = 3)
+
+```
+
+#hierarchical clustering 
+
+```{r}
+dist_matrix <- dist(x) 
+hc <- hclust(d = dist_matrix)
+hc 
+hc <- hclust(dist(x))
+
+
+
+```
+
+```{r}
+plot(hc)
+abline(h=6, col="red")
+cutree(hc, h=6)
+```
+
+```{r}
+gp2<- cutree(hc, k=2)
+gp2
+```
+
+```{r}
+gp3 <- cutree(hc, k=3)
+gp3
+
+table(gp2)
+table(gp3)
+```
+
+```{r}
+x <- rbind(
+ matrix(rnorm(100, mean=0, sd = 0.3), ncol = 2), # c1
+ matrix(rnorm(100, mean = 1, sd = 0.3), ncol = 2), # c2
+ matrix(c(rnorm(50, mean = 1, sd = 0.3), # c3
+ rnorm(50, mean = 0, sd = 0.3)), ncol = 2))
+colnames(x) <- c("x", "y")
+
+plot(x)
+
+col <- as.factor( rep(c("c1","c2","c3"), each=50) )
+plot(x, col=col)
+
+
+dist <- dist(x)
+hc <- hclust(dist(x))
+plot(hc)
+cutree(hc, h=2.5)
+cutree(hc, h = 2.2)
+
+```
+

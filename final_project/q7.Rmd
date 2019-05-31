@@ -1,0 +1,46 @@
+---
+title: "Untitled"
+output: github_document
+---
+
+```{r}
+library(bio3d)
+
+```
+
+```{r }
+file <- "muscle_file.fst"
+aln  <- read.fasta(file)
+aln
+conserved <-consensus(aln)
+```
+
+
+
+
+```{r }
+seq <- seqidentity(aln, normalize=TRUE, similarity=FALSE, ncore=1, nseg.scale=1)
+par(oma=c(1,1,1,1))
+heatmap(seq,cexRow=0.75, cexCol = 0.75)
+
+```
+
+
+
+```{r}
+blast <- blast.pdb(aln, database = "pdb", time.out = NULL, chain.single=TRUE)
+#blast <- blast.pdb("seqdump (10).txt", database = "pdb", time.out = NULL, chain.single=TRUE)
+blast
+
+#pdb.annotate()
+
+```
+```{r}
+plot.blast(blast)
+
+```
+
+```{r}
+pdb.annotate(c("5YTS","1H9S","4A4I"))
+```
+

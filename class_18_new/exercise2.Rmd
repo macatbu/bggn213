@@ -1,0 +1,81 @@
+---
+title: "Untitled"
+output: github_document
+---
+
+
+```{r setup, include=FALSE}
+library("bio3d")
+file = "lecture18_sequences.fa"
+
+data <- read.fasta(file)
+
+```
+
+```{r}
+
+data$ali[,41]
+
+
+start.ind <- 41-8
+end.ind <- 41 + 8
+
+data$ali[, start.ind:end.ind]
+
+```
+
+```{r}
+missmat<- conserv(data, method = "identity")
+missmat <- which(missmat < 1)
+```
+
+```{r}
+
+
+
+```
+
+
+Find the missmatches that are not just a gap 
+
+```{r}
+
+gaps <- gap.inspect(data)
+gap.inds <- gaps$t.inds
+
+
+tumor_mut <- missmat[!missmat %in% gap.inds]
+
+```
+
+
+
+```{r }
+#data$ali[i, tumor_mut]
+  
+ids <- paste(data$ali[1, tumor_mut], tumor_mut, data$ali[2,tumor_mut], sep = "")
+
+
+```
+
+```{r}
+start.ind <- tumor_mut - 8
+end.ind <- tumor_mut + 8
+
+tumor <- NULL
+for(i in 1:length(start.ind)){
+  tumor <- seqbind(tumor, data$ali[2, start.ind[i]:end.ind[i]])
+}
+
+
+```
+
+
+
+
+```{r pressure, echo=FALSE}
+
+write.fasta(ids=ids, ali=tumor, file = "subsequences.fa")
+```
+
+

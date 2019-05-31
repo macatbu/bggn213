@@ -1,0 +1,77 @@
+---
+title: "PCA exercise"
+output: html_notebook
+---
+
+#PCA
+
+```{r}
+w <- read.csv("UK_foods.csv", row.names = 1)
+
+dim(w)
+w
+
+
+head(w)
+
+
+```
+
+```{r}
+
+
+
+barplot(as.matrix(w), beside=F, col=rainbow(nrow(w)))
+
+pairs(w, col=rainbow(10), pch=16)
+
+pca <- prcomp( t(w))
+summary(pca)
+my_cols <- c("orange", "yellow", "green","blue")
+
+
+plot(pca$x[,1], pca$x[,2], xlab="PC1", ylab="PC2", xlim=c(-270,500), col = my_cols)
+text(pca$x[,1], pca$x[,2], colnames(x))
+
+abline(x = 0, y= 0)
+```
+
+```{r}
+pca <- prcomp( t(x), scale = TRUE )
+summary(pca)
+
+
+plot(pca$x[___,___], pca$x[___,___], xlab="PC1", ylab="PC2", xlim=c(-270,500))
+text(pca$x[,1], pca$x[,2], colnames(x))
+```
+
+```{r}
+mydata <- read.csv("expression.csv", row.names = 1)
+
+dim(mydata)
+
+pca <- prcomp(t(mydata), scale=TRUE) 
+attributes(pca)
+
+plot(pca$x[,1], pca$x[,2]) 
+pca.var <- pca$sdev^2 
+pca.var.per <- round(pca.var/sum(pca.var)*100, 1) 
+pca.var.per
+
+xlab <- paste("PC1 (", pca.var.per[1], %)", sep="")
+ylab <- paste("PC2 (", pca.var.per[2], %)", sep="")
+
+xlab 
+ylab
+barplot(pca.var.per, main="Scree Plot",
+ xlab="Principal Component", ylab="Percent Variation")
+
+
+## A vector of colors for wt and ko samples
+colvec <- as.factor( substr( colnames(mydata), 1, 2) )
+plot(pca$x[,1], pca$x[,2], col=colvec, pch=16,
+ xlab=paste0("PC1 (", pca.var.per[1], "%)"),
+ ylab=paste0("PC2 (", pca.var.per[2], "%)")) 
+```
+
+
