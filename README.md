@@ -6,7 +6,7 @@
 
 - Class 04: [**Introduction to R**](https://github.com/macatbu/bggn213/blob/master/Class%204:%20R%20Basics/Class_4-_In_Class_Exercise.md)
 
-- Class 05: [**R graphics**]()
+- Class 05: [**R graphics**](https://github.com/macatbu/bggn213/blob/master/class05/Class_5-_Data_Visualization.md)
 
 - Class 06: [**R functions**]()
 
