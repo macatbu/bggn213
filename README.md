@@ -1,6 +1,6 @@
 ## Welcome to my page for my coursework for [BGG213](https://bioboot.github.io/bggn213_S19/)
 
-![coding is fun!](https://i2.wp.com/ksusentinel.com/wp-content/uploads/2016/02/20445410520_97a11633c7_o.jpg?w=2310)
+![coding is fun!](https://i.redd.it/3aea98bee4a11.jpg)
 
 ### Explore my work by class below:
 
