@@ -1,4 +1,10 @@
-## Welcome to GitHub Pages
+### Welcome to my page for my coursework for BGG213
+
+## I will add my class content here
+
+- Class 05: [Introduction to R](https://github.com/macatbu/bggn213/blob/master/Class%204:%20R%20Basics/Class_4-_In_Class_Exercise.md).
+
+- Class 06: [Plotting in R]()
 
 You can use the [editor on GitHub](https://github.com/macatbu/bggn213/edit/master/README.md) to maintain and preview the content for your website in Markdown files.
 
@@ -26,12 +32,3 @@ Syntax highlighted code block
 [Link](url) and ![Image](src)
 ```
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/macatbu/bggn213/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
