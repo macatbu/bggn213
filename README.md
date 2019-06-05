@@ -4,12 +4,17 @@
 
 ### Explore my work by class below:
 
-- Class 05: [Introduction to R](https://github.com/macatbu/bggn213/blob/master/Class%204:%20R%20Basics/Class_4-_In_Class_Exercise.md)
+- Class 04: [**Introduction to R**](https://github.com/macatbu/bggn213/blob/master/Class%204:%20R%20Basics/Class_4-_In_Class_Exercise.md)
 
-- Class 06: [Plotting in R]()
+- Class 05: [**R graphics**]()
 
-- Class 07: [Theme] ()
+- Class 06: [**R functions**]()
 
+- Class 07: [**Theme**]()
+
+- Class 08: [**Theme**]()
+
+- Class 09: [**Theme**]()
 
 
 
