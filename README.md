@@ -14,7 +14,7 @@
 
 - Class 08: [**Theme**]()
 
-- Class 09: [**Theme**]()
+- Class 09: [**Machine Learning**](https://github.com/macatbu/bggn213/blob/master/class09/Class_09_Breast_Cancer_Activity.md)
 
 
 
