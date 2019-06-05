@@ -1,4 +1,4 @@
-## Welcome to my page for my coursework for BGG213
+## _Welcome to my page for my coursework for BGG213_
 
 ### I will add my class content here
 
@@ -14,14 +14,4 @@
 
 
 
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
-```
 
