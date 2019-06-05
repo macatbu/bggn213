@@ -1,4 +1,4 @@
-## Welcome to my page for my coursework for [BGG213](https://bioboot.github.io/bggn213_S19/)
+## Welcome to my page for my coursework for [BGG213](https://bioboot.github.io/bggn213_S19/)!
 
 ![coding is fun!](https://i.redd.it/3aea98bee4a11.jpg)
 
