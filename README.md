@@ -16,7 +16,7 @@
 
 - Class 09: [**Machine Learning Exercise: Breat Cancer**](https://github.com/macatbu/bggn213/blob/master/class09/Class_09_Breast_Cancer_Activity.md)
 
-- Class 10:[**Github**]()
+- Class 10:[**Github**](https://github.com/macatbu/bggn213)
 
 - Class 11:[**Structural Bioinformatics**](https://github.com/macatbu/bggn213/blob/master/class11/Class_11.md)
 
