@@ -26,7 +26,7 @@
 
 - Class 14: [**RNASeq upcoming**]()
 
-- Class 15:[**Genome Annotation upcoming**]()
+- Class 15:[**Genome Annotation**](https://github.com/macatbu/bggn213/blob/master/class15_new/class15_gene_ontology.md)
 
 - Class 16: [**UNIX for Bioinformatics upcoming**]()
 
