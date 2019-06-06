@@ -13,7 +13,7 @@ _photo by Ryan Szot Photography_
 
 - Class 07: [**R Bioinformatics Packages upcoming**]()
 
-- Class 08: [**Introduction to Machine Learning upcoming**]()
+- Class 08: [**Introduction to Machine Learning**](https://github.com/macatbu/bggn213/blob/master/class08/Class_08_PCA.md)
 
 - Class 09: [**Machine Learning Exercise: Breast Cancer**](https://github.com/macatbu/bggn213/blob/master/class09/Class_09_Breast_Cancer_Activity.md)
 
