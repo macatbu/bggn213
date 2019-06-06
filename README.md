@@ -11,7 +11,7 @@ _photo by Ryan Szot Photography_
 
 - Class 06: [**R functions**](https://github.com/macatbu/bggn213/blob/master/class06/Class_6-_R_functions_.md)
 
-- Class 07: [**R Bioinformatics Packages upcoming**]()
+- Class 07: [**R Bioinformatics Packages**](https://github.com/macatbu/bggn213/blob/master/class07/Class_07-_R_functions_practice.md)
 
 - Class 08: [**Introduction to Machine Learning**](https://github.com/macatbu/bggn213/blob/master/class08/Class_08_PCA.md)
 
@@ -21,7 +21,7 @@ _photo by Ryan Szot Photography_
 
 - Class 11:[**Structural Bioinformatics**](https://github.com/macatbu/bggn213/blob/master/class11/Class_11.md)
 
-- Class 12: [**Bioinformatics in Drug Discovery upcoming**]()
+- Class 12: [**Bioinformatics in Drug Discovery SOON **]()
 
 - Class 13: [**Genome informatics and high throughput sequencing**](https://github.com/macatbu/bggn213/blob/master/class13/Class_13-_Genome_Informatics.md)
 
@@ -29,11 +29,11 @@ _photo by Ryan Szot Photography_
 
 - Class 15:[**Genome Annotation**](https://github.com/macatbu/bggn213/blob/master/class15_new/class15_gene_ontology.md)
 
-- Class 16: [**UNIX for Bioinformatics upcoming**]()
+- Class 16: [**UNIX for Bioinformatics SOON **]()
 
-- Class 17:[**Network Analysis upcoming**]()
+- Class 17:[**Network Analysis SOON**]()
 
-- Class 18: [**Cancer Genomics upcoming**]()
+- Class 18: [**Cancer Genomics SOON**]()
 
 
 
