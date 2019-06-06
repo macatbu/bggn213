@@ -22,7 +22,7 @@
 
 - Class 12: [**Bioinformatics in Drug Discovery upcoming**]()
 
-- Class 13: [**Genome informatics and high throughput sequencing upcoming**]()
+- Class 13: [**Genome informatics and high throughput sequencing**](https://github.com/macatbu/bggn213/blob/master/class13/Class_13-_Genome_Informatics.md)
 
 - Class 14: [**RNASeq upcoming**]()
 
