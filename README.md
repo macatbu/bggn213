@@ -1,6 +1,7 @@
 ## Welcome to my page for my coursework for [BGG213](https://bioboot.github.io/bggn213_S19/)!
 
-![coding is fun!](https://i.redd.it/3aea98bee4a11.jpg)
+![coding is fun!](https://i.etsystatic.com/isbl/43b096/33880950/isbl_fullxfull.33880950_a8er9w1q.jpg?version=0)
+_photo by Ryan Szot Photography_
 
 ### Explore my work by class below:
 
