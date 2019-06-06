@@ -9,7 +9,7 @@ _photo by Ryan Szot Photography_
 
 - Class 05: [**R graphics**](https://github.com/macatbu/bggn213/blob/master/class05/Class_5-_Data_Visualization.md)
 
-- Class 06: [**R functions upcoming**]()
+- Class 06: [**R functions**](https://github.com/macatbu/bggn213/blob/master/class06/Class_6-_R_functions_.md)
 
 - Class 07: [**R Bioinformatics Packages upcoming**]()
 
