@@ -17,9 +17,9 @@ _photo by Ryan Szot Photography_
 
 - Class 09: [**Machine Learning Exercise: Breast Cancer**](https://github.com/macatbu/bggn213/blob/master/class09/Class_09_Breast_Cancer_Activity.md)
 
-- Class 10:[**Github**](https://github.com/macatbu/)
+- Class 10: [**Github**](https://github.com/macatbu/)
 
-- Class 11:[**Structural Bioinformatics**](https://github.com/macatbu/bggn213/blob/master/class11/Class_11.md)
+- Class 11: [**Structural Bioinformatics**](https://github.com/macatbu/bggn213/blob/master/class11/Class_11.md)
 
 - Class 12: [**Bioinformatics in Drug Discovery SOON **]()
 
@@ -27,11 +27,11 @@ _photo by Ryan Szot Photography_
 
 - Class 14: [**RNASeq**](https://github.com/macatbu/bggn213/blob/master/class14/Class_14-_RNA-seq.md)
 
-- Class 15:[**Genome Annotation**](https://github.com/macatbu/bggn213/blob/master/class15_new/class15_gene_ontology.md)
+- Class 15: [**Genome Annotation**](https://github.com/macatbu/bggn213/blob/master/class15_new/class15_gene_ontology.md)
 
 - Class 16: [**UNIX for Bioinformatics SOON **]()
 
-- Class 17:[**Network Analysis SOON**]()
+- Class 17: [**Network Analysis SOON**]()
 
 - Class 18: [**Cancer Genomics SOON**]()
 
