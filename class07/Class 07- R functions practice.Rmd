@@ -1,0 +1,265 @@
+---
+title: 'Class 7: R functions and packages'
+output: github_document
+---
+
+#This is work from an in-class exercise in function writing. 
+
+First we will use the same function from the other day.
+
+# Function 1: Rescale
+
+```{r}
+source("http://tinyurl.com/rescale-R")
+
+# insert a stop statment to fail early and loudly 
+
+rescale <- function(x, na.rm=TRUE, plot=FALSE, ...) {
+  if( !is.numeric(x) ) {
+ stop("Input x should be numeric", call.=FALSE)
+ }
+  rng <-range(x, na.rm=na.rm)
+  
+  answer <- (x - rng[1]) / (rng[2] - rng[1])
+  if(plot) {
+    plot(answer, ...)
+  }
+  return(answer)
+}
+
+rescale( c(1:10) )
+
+```
+
+# Function 2: both_na
+
+We want to write a function, called both_na(), that counts how many positions in two input vectors, x and y, both have a missing value
+
+```{r}
+
+# start with a smaller problem, tell if there is any NA in both functions
+
+# give your function small input to test if it works 
+
+x <- c( 1, 2, NA, 3, NA)
+y <- c(NA, 3, NA, 3, 4)
+
+
+if (sum(is.na(x)) >= 1 & sum(is.na(y)) >= 1) {
+  print("I work!")
+}
+
+
+```
+
+```{r}
+
+# now put this into a function 
+
+both_na <- function(x,y) {
+  if (sum(is.na(x)) >= 1 & sum(is.na(y)) >= 1) {
+  print("I work!")
+}
+}
+
+
+```
+
+Now that our small function works we can make it more complicated! 
+
+```{r}
+
+both_na3 <- function(x, y) {
+ if(length(x) != length(y)) {
+   # add in sanity checks to prevent bugs
+ stop("Input x and y should be vectors of the same length")
+ }
+
+ na.in.both <- ( is.na(x) & is.na(y) )
+ na.number <- sum(na.in.both)
+ na.which <- which(na.in.both)
+ message(
+  
+ )
+# return relevant data we want from our function 
+ return( list(number=na.number, which=na.which) )
+}
+
+
+both_na3(x,y)
+```
+
+# Function 3: Calculate Students' Grades 
+
+Calculate a function to output the average grade of a student. For this function I turned any NAs to 0s. Also drop the lowest grade for each student when calculating the average. 
+
+```{r}
+
+#here is our data input we are working with 
+
+student1 <- c(100, 100, 100, 100, 100,100, 100, 90)
+student2 <- c(100, NA, 90, 90,90, 90, 97, 80)
+
+# here is our function 
+calculate_grade <- function(student){
+  # take NAs and convert them to 0s
+  if(sum(is.na(student)) >= 1) {
+    student <- replace(student, is.na(student), 0)
+  }
+  # find the lowest grade for the student
+  this_min = min(student)
+  # drop this lowest grade 
+  average = (sum(student) - this_min) / (length(student) - 1)
+  # print out the results 
+  print("The average for the student is:")
+  print(average)
+}
+
+# run my function
+calculate_grade(student2)
+
+```
+
+Testing our my new function
+```{r}
+# read in a file of student scores 
+df <- read.csv('student_homework.csv', row.names = 1)
+df
+
+# run my function on my file 
+calculate_grade(df[1,])
+
+# try using apply to run my function on the file
+answer <- apply(df, 1 ,calculate_grade)
+
+```
+
+```{r}
+
+# sort the students by their grades
+
+sort(answer, decreasing = TRUE)
+
+```
+
+# Function 4: Find common genes in two datasets 
+
+This is another example problem from the class 7 lecture. 
+
+We will start small with a example dataset.
+
+```{r}
+
+# create two data frames with genes and their expression 
+
+df1 <- data.frame(IDs=c("gene1", "gene2", "gene3"),
+ exp=c(2,1,1),
+ stringsAsFactors=FALSE)
+
+df2 <- data.frame(IDs=c("gene2", "gene4", "gene3", "gene5"),
+ exp=c(-2, NA, 1, 2),
+ stringsAsFactors=FALSE)
+
+```
+
+
+Simplify these into single vectors 
+```{r}
+
+x <- df1$IDs
+y <- df2$IDs
+
+```
+
+
+We can use the built in function to R of intersect
+```{r}
+
+intersect(x, y)
+
+# this isn't quite what we want we want their locations or indicies
+```
+
+
+```{r}
+
+# instead let's try 
+
+x %in% y
+
+```
+
+Find the smallest working snippet that you can then put into a function
+```{r}
+
+cbind( x[ x %in% y ], y[ y %in% x ] )
+
+```
+
+Now that it works put it into a function! Woot!
+```{r}
+
+gene_intersect <- function(x, y) {
+  cbind( x[ x %in% y ], y[ y %in% x ] )
+}
+
+```
+
+Now run our function:
+```{r}
+
+gene_intersect(x,y)
+
+```
+
+# Exercise to practice using packages in R. We practiced used ggplot2
+
+First install like this:
+install.packages("BiocManager")
+install.packages("ggplot2")
+library("ggplot2")
+
+
+```{r}
+
+# here we are reading in a library with data
+
+# example of how plotting in base R
+
+library(tidyverse)
+
+housing <- read_csv("dataSets/landdata-states.csv")
+
+plot(Home.Value ~ Date,
+     col = factor(State),
+     data = filter(housing, State %in% c("MA", "TX")))
+
+legend("topleft",
+       legend = c("MA", "TX"),
+       col = c("black", "red"),
+       pch = 1)
+
+
+```
+
+```{r}
+
+# example of how using ggplot it becomes a much more beautiful plot! 
+
+ggplot(filter(housing, State %in% c("MA", "TX")),
+       aes(x=Date,
+           y=Home.Value,
+           color=State))+
+  geom_point()
+
+
+```
+
+```{r}
+
+sessionInfo()
+
+```
+
+
+
