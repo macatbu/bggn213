@@ -21,7 +21,7 @@ _photo by Ryan Szot Photography_
 
 - Class 11: [**Structural Bioinformatics**](https://github.com/macatbu/bggn213/blob/master/class11/Class_11.md)
 
-- Class 12: [**Bioinformatics in Drug Discovery SOON **]()
+- Class 12: [**Bioinformatics in Drug Discovery**](https://github.com/macatbu/bggn213/blob/master/class12/Class_12-_Structural_Bioinformatics.md)
 
 - Class 13: [**Genome informatics and high throughput sequencing**](https://github.com/macatbu/bggn213/blob/master/class13/Class_13-_Genome_Informatics.md)
 
