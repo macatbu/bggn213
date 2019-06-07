@@ -1,0 +1,346 @@
+---
+title: "Class 11: Structural Bioinformatics"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Section 1: Introduction to the RCSB Protein Data Bank 
+
+Downloaded a CSV file from http://www.rcsb.org/stats/summary on 05-08-2019.
+
+Download a CSV file from the PDB site (accessible from “Analyze” -> “PDB Statistics” >
+“by Experimental Method and Molecular Type”. 
+
+```{r}
+
+data <- read.csv("Data Export Summary.csv", row.names = 1)
+
+#check what data we downloaded 
+
+head(data)
+
+```
+
+
+Can you determine what proportion of structures are protein? 
+```{r}
+
+calculate <- sum(data$Proteins) / (sum(data$Total))
+calculate
+
+
+```
+
+Determine the percentage of structures are solved by x-Ray and electron microscopy
+
+```{r}
+
+# solved by x-ray
+
+data$Total[1]
+
+# solved by electron microscopy 
+
+data$Total[3]
+
+
+```
+
+# Section 2 : Using VMD
+In this section we will use the 2Å resolution X-ray crystal structure of HIV-1 protease with a
+bound drug molecule indinavir (PDB ID: 1HSG) [3]. We will use the VMD molecular viewer to
+visually inspect the protein, the binding site and the drug molecule. After exploring features of
+the complex we will move on to computationally dock a couple of drug molecules into the
+binding site of HIV-1 protease to see how well computational docking can reproduce the
+crystallographically observed binding pose. If time permits, we will also explore the
+conformational dynamics and flexibility of the protein - important for it’s function and for
+considering during drug design.
+
+# Section 3 : Introduction to Bio3D in R
+
+Let's read the PDB file we downloaded into R to see how things live in this space
+
+```{r}
+
+# load the bio3d package which we are going to use
+
+library(bio3d)
+
+
+```
+
+Reading PDB file data into R
+
+```{r}
+
+pdb <- read.pdb("1hsg.pdb")
+
+
+```
+
+View what is in a PDB file 
+
+```{r}
+
+pdb
+
+```
+
+How many amino acid residues are there in this pdb object and what are the two nonprotein residues?
+
+```{r}
+# first look at the attributes stored in our PDB file 
+
+attributes(pdb)
+
+```
+To access these individual attributes we use the dollar-attribute name convention that is common with R list objects
+
+```{r}
+
+head(pdb$atom)
+
+```
+```{r}
+
+# Print a subset of $atom data for the first two atoms
+pdb$atom[1:2, c("eleno", "elety", "x","y","z")]
+
+```
+
+Also information of structure by coordinates 
+
+```{r}
+# Print a summary of the coordinate data in $xyz
+pdb$xyz
+
+```
+
+
+# Section 4: Atom Selection
+The Bio3D atom.select() function is arguably one of the most challenging for newcomers to
+master. It is however central to PDB structure manipulation and analysis. At its most basic, this
+function operates on PDB structure objects (as created by read.pdb()) and returns the
+numeric indices of a selected atom subset. These indices can then be used to access the
+$atom and $xyz attributes of PDB structure related objects.
+
+```{r}
+
+# Select all C-alpha atoms (return their indices)
+ca.inds <- atom.select(pdb, "calpha")
+ca.inds
+
+```
+
+
+Select residue number 10
+```{r}
+
+inds <- atom.select(pdb, resno = 10)
+
+inds
+
+```
+
+# PDB Object Trimming 
+This is a way to take only parts of the PDB file that you are interested and output them into a new PDB file 
+
+```{r}
+
+indicies_to_save <- atom.select(pdb, 'protein', value=TRUE)
+indicies_to_save
+write.pdb(indicies_to_save, file = "1HSG_PROTEIN.pdb") 
+
+```
+
+
+If you just want the ligand or drug you can select it and save it to a new PDB file
+
+```{r}
+
+ligand_inds <- atom.select(pdb, 'ligand', value=TRUE) 
+write.pdb(ligand_inds, file = "1HSE_LIGAND.pdb") 
+
+```
+
+
+# Section 5: 3D structure viewing in R
+
+You can view 3D structures within R using the bio3d.view package.
+
+```{r}
+
+# The 'devtools' package allows us to install development versions
+#install.packages("devtools")
+
+
+#install.packages("rgl")
+
+# Install the bio3d.view package from bitbucket
+#devtools::install_bitbucket("Grantlab/bio3d-view")
+
+```
+
+
+```{r}
+
+# load the package we need 
+library("bio3d.view")
+
+# view our PDB file 
+view(pdb, "overview", col="sse")
+
+```
+
+
+For example, here we use the view() function to visualize the results of a Normal Mode Analysis, a bioinformatics method that can predict the
+major motions of biomolecules.
+
+```{r}
+
+pdb <- read.pdb("1hel")
+
+# Normal mode analysis calculation
+
+modes <- nma(pdb)
+m7 <- mktrj(modes,
+ mode=7,
+ file="mode_7.pdb")
+
+view(m7, col=vec2color( rmsf(m7) ))
+
+
+```
+
+# Section 6: Working with multiple PDB files
+
+Before delving into more advanced analysis (detailed in the next section and additional vignettes) lets examine how we can read multiple PDB structures from the RCSB PDB for a particular protein and perform some basic analysis:
+
+Note! You will need to download the appropriate version of the muscle multiple alignment program from: https://www.drive5.com/muscle/downloads.htm
+
+Execute these things in Terminal! 
+```{bash}
+
+#sudo curl -o "/usr/local/bin/muscle" "http://thegrantlab.org/misc/
+#muscle"
+
+#sudo chmod +x /usr/local/bin/muscle
+
+```
+
+Now back in R, we are going to align multiple structures to compare them
+
+```{r}
+
+# make of list of the PDB files you are interested in
+
+ids <- c("1TND_B","1AGR_A","1TAG_A","1GG2_A","1KJY_A","4G5Q_A")
+
+# Download the PDB files
+#split = TRUE requests further that we want to extract particular chains, i.e. those specified by the _A suffix of each PDB ID in the example above
+
+files <- get.pdb(ids, split = TRUE)
+
+
+```
+
+```{r}
+
+# Extract and align the chains we are interested in
+pdbs <- pdbaln(files, fit = TRUE)
+
+# Print to screen a summary of the 'pdbs' object
+pdbs
+
+```
+
+```{r}
+
+# Access the first 5 rows, and 8 columns
+pdbs$ali[1:5, 1:8]
+
+# Associated residues numbers
+pdbs$resno[1:5, 1:8]
+
+```
+
+```{r}
+
+
+# Calculate pairwise sequence identity between strucuters 
+seqidentity(pdbs)
+
+
+
+```
+
+```{r}
+
+# This calculates the root mean square deviation
+rmsd(pdbs)
+
+```
+
+
+These functions we ran calculate similarity by using clustering analysis algorithms 
+
+```{r}
+
+# Calculate RMSD
+rd <- rmsd(pdbs)
+
+# Clustering
+hc <- hclust(as.dist(rd))
+grps <- cutree(hc, k=3)
+
+# Plot results as dendrogram
+hclustplot(hc, k=3)
+
+```
+
+Running PCA analysis on our list of structures to compare them 
+```{r}
+
+view(pdbs)
+
+pca.xray <- pca(pdbs)
+
+plot(pca.xray)
+
+```
+
+```{r}
+
+# just visualize the first principal component
+pc1 <- mktrj(pca.xray, pc=1, file="pc_1.pdb")
+
+```
+
+Now we can go back to using bio3d.view to look at the structures we are comparing 
+```{r}
+# make sure library is loaded 
+library(bio3d.view)
+
+# Structural displacements captured by PC1
+view(pc1)
+
+# The rglwidget() function from the rgl
+# package will show output in your Rmd
+# notebook and rendered html_output
+# documents
+library(rgl)
+#rglwidget(pc1)
+
+```
+
+As always, save sessionInfo() for reproducibility
+
+```{r}
+
+sessionInfo()
+
+```
+
