@@ -1,4 +1,4 @@
-Class 12: Structural Bioinformatics
+Class 12: Bioinformatics in Drug Discovery
 ================
 
 Section 1: In silico docking of drugs to HIV-1 protease
