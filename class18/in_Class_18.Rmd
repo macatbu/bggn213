@@ -1,0 +1,360 @@
+---
+title: "Class 18: Cancer Genomics"
+output: github_document
+---
+
+# Part 1: NCI- Genomic Data Commons 
+
+In this exercise we explored the NCI- Genomic Data Commons and saw how we can access information by different mutations or different cancer types. 
+
+An R packages exists for the Genomic Data Commons to pull from and analyze cancer datasets. 
+
+These packages need to first be downloaded then loaded into Rstudio. 
+
+```{r }
+
+library(GenomicDataCommons)
+library(TCGAbiolinks)
+library(maftools)
+
+```
+
+Check the status to make sure it is working. 
+```{r}
+
+status()
+
+```
+
+# Querying the GDC from R
+We will typically start our interaction with the GDC by searching the resource to find data that we are interested in investigating further. The are four main sets of metadata that we can query, namely projects(), cases(), files(), and  annotations(). We will start with projects()
+
+
+```{r }
+
+# here's how to get projects
+projects <- getGDCprojects()
+
+# what do we have to choose from
+head(projects)
+
+
+```
+
+Moving onto cases() we can use an example from the package associated publication to answer our first from question above (i.e. find the number of cases/patients across different projects within the GDC):
+
+```{r}
+
+# we can calculate the stats for how many patients each project has so we can choose which we are most interested in
+cases_by_project <- cases() %>%
+  facet("project.project_id") %>%
+  aggregations()
+
+# check the values we calculated
+head(cases_by_project)
+
+```
+
+Q9. Write the R code to make a barplot of the cases per project. Lets plot this data with a log scale for the y axis (log="y"), rotated axis labels (las=2) and color the bar coresponding to the TCGA-PAAD project.
+
+```{r}
+
+x <- cases_by_project$project.project_id
+
+# Make a custom color vector for our plot
+# Highlight the "TCGA=PAAD" project in red 
+colvec <- rep("lightblue", nrow(x))
+colvec[x$key == "TCGA-PAAD"] <- "red"
+
+# Plot with 'log' for y axis and rotate labels with 'las'
+par(mar=c(8,4,4,4))
+barplot(x$doc_count, names.arg=x$key, log="y", col=colvec, las=2, cex.names = .5, cex.axis = .5)
+
+```
+
+We can use the getSampleFilesSummary() function to determine for a given project how many cases and what type of data we have available for each case:
+
+```{r}
+
+samp <- getSampleFilesSummary("TCGA-PAAD")
+
+```
+
+```{r}
+
+head(samp)
+
+```
+
+Now we can use GDCquery() function to focus in on a particular data type that we are interested in. For example, to answer our second question from above - namely ‘find all gene expression data files for all pancreatic cancer patients’:
+
+```{r}
+
+query <- GDCquery(project="TCGA-PAAD",
+                  data.category="Transcriptome Profiling",
+                  data.type="Gene Expression Quantification")
+
+ans <- getResults(query)
+
+```
+
+```{r}
+
+# what are our answers
+head(ans)
+
+```
+
+In RStudio we can now use the View() function to get a feel for the data organization and values in the returned  ans object.
+
+# Variant Analysis 
+
+Lets do a search in R with the help of the TCGAbiolinks package function GDCquery_Maf(). For brevity we will focus on only one of the MAF files for this project, namely the MuTect2 workflow variant calls.
+
+
+```{r}
+
+maf.file <- GDCquery_Maf(tumor="PAAD", pipelines = "mutect")
+
+```
+
+
+```{r}
+
+head(maf.file)
+
+```
+
+MAF analysis
+The MAF file contents is now stored as a dataframe and the maftools package workflow, which starts with a MAF file or dataframe, can proceed, starting with reading the pancreatic cancer MAF file.
+
+```{r}
+
+vars = read.maf(maf = maf.file, verbose = FALSE)
+
+```
+
+We can use plotmafSummary() function to plot a summary of the maf object, which displays number of variants in each sample as a stacked barplot and variant types as a boxplot summarized by Variant_Classification. 
+
+```{r}
+par(mar=c(2,2,2,2))
+plotmafSummary(vars)
+
+```
+
+Drawing Oncoplots
+There is a built in function called oncoplots, also known as waterfall plots
+
+```{r}
+
+oncoplot(maf = vars, top = 10)
+
+
+```
+
+Oncostrip
+Another visualization technique
+
+```{r}
+
+oncostrip(maf=vars, genes=c("KRAS", "TP53"))
+
+
+```
+
+Can create a lollipop plot for the KRAS gene
+
+```{r}
+
+lollipopPlot(vars, gene='KRAS')
+
+```
+
+Can also make a lollipop plot for P53
+
+```{r}
+
+lollipopPlot(vars, gene='TP53')
+
+```
+
+
+# Part 2: Designing a personalized cancer vaccine 
+
+In this exercise we will be identifying somatic mutations by comparing sequences of DNA from a control and a cancer patient. Then we will select 9 mers that are cancer specific to design a personalized cancer vaccine. 
+
+Here are the FASTA files of each
+>P53_wt Cellular tumor antigen p53 - Healthy Tissue
+MEEPQSDPSVEPPLSQETFSDLWKLLPENNVLSPLPSQAMDDLMLSPDDIEQWFTEDPGP
+DEAPRMPEAAPPVAPAPAAPTPAAPAPAPSWPLSSSVPSQKTYQGSYGFRLGFLHSGTAK
+SVTCTYSPALNKMFCQLAKTCPVQLWVDSTPPPGTRVRAMAIYKQSQHMTEVVRRCPHHE
+RCSDSDGLAPPQHLIRVEGNLRVEYLDDRNTFRHSVVVPYEPPEVGSDCTTIHYNYMCNS
+SCMGGMNRRPILTIITLEDSSGNLLGRNSFEVRVCACPGRDRRTEEENLRKKGEPHHELP
+PGSTKRALPNNTSSSPQPKKKPLDGEYFTLQIRGRERFEMFRELNEALELKDAQAGKEPG
+GSRAHSSHLKSKKGQSTSRHKKLMFKTEGPDSD
+
+>P53_mutant Cellular tumor antigen p53 - Tumor Tissue
+MEEPQSDPSVEPPLSQETFSDLWKLLPENNVLSPLPSQAMLDLMLSPDDIEQWFTEDPGP
+DEAPWMPEAAPPVAPAPAAPTPAAPAPAPSWPLSSSVPSQKTYQGSYGFRLGFLHSGTAK
+SVTCTYSPALNKMFCQLAKTCPVQLWVDSTPPPGTRVRAMAIYKQSQHMTEVVRRCPHHE
+RCSDSDGLAPPQHLIRVEGNLRVEYLDDRNTFVHSVVVPYEPPEVGSDCTTIHYNYMCNS
+SCMGGMNRRPILTIITLEV
+
+```{r}
+
+# load bio3d
+library("bio3d")
+
+# read in the fasta file
+file = "lecture18_sequences.fa"
+
+# save fasta file 
+data <- read.fasta(file)
+
+```
+
+```{r}
+
+# combine the two fasta sequences 
+
+seqbind(data)
+
+# align the two fasta sequences
+
+seqaln(data)
+
+
+```
+
+```{r}
+
+# we see that ind 41 is a mismatch
+
+data$ali[,41]
+
+```
+
+```{r}
+
+# starting to write code to create a 9 mer
+
+# 9 mers would start here
+start.ind <- 41-8
+
+# and end here
+end.ind <- 41 + 8
+
+# extra this string that captures all of the 9 mers
+data$ali[, start.ind:end.ind]
+
+
+```
+
+```{r}
+
+# to pull out all of the locations of mismatches use the built in function conserve by method "identity"
+
+missmat<- conserv(data, method = "identity")
+
+# This returns a boolean value, to get all of the non-matching spots we want FALSE which returns value .5 (so want all less than 1)
+
+missmat <- which(missmat < 1)
+
+```
+
+Find the missmatches that are not just a gap 
+
+```{r}
+
+# use this built in function to find gaps in alignments 
+
+gaps <- gap.inspect(data)
+
+# find the locations of the gaps and save them 
+
+gap.inds <- gaps$t.inds
+
+# for possible tumor somatic mutations where we take our mismatches but removed the gaps 
+
+tumor_mut <- missmat[!missmat %in% gap.inds]
+
+```
+
+Which indicies does this leave us?
+```{r}
+
+tumor_mut
+
+```
+
+We have 4 mismatches 
+
+```{r}
+
+# find the names of the mutations 
+
+ids <- paste(data$ali[1, tumor_mut], tumor_mut, data$ali[2,tumor_mut], sep = "")
+
+ids
+
+
+```
+
+
+```{r}
+
+# now we are writing a general code to take all of the mismatches, and calculate the 9 mers we are interseted in 
+
+start.ind <- tumor_mut - 8
+end.ind <- tumor_mut + 8
+
+tumor <- NULL
+for(i in 1:length(start.ind)){
+  tumor <- seqbind(tumor, data$ali[2, start.ind[i]:end.ind[i]])
+}
+
+```
+
+save these subsequences
+```{r pressure, echo=FALSE}
+
+write.fasta(ids=ids, ali=tumor, file = "subsequences.fa")
+
+```
+
+We will use these 9 mers to look for possible HLA sequences that we can use for vaccine creation.
+
+# Section 2. Patient HLA typing results and HLA binding prediction:
+The HLA molecules expressed in an individual can be identified based on DNA or RNA sequencing of normal tissue or by targeted HLA sequencing assays, and by comparison of the results to specialized databases listing all known human HLA alleles.
+
+The following HLA typing results were obtained for our patient of interest.
+
+HLA-A*02:01   
+HLA-A*68:01 
+HLA-B*07:02 
+HLA-B*35:01
+To prioritize which of the mutations in a tumor should be included in a vaccine, they can be scanned for those resulting in mutated peptides that bind HLA molecules of the patient with high affinity. This is done using HLA binding algorithms generated using machine learning algorithms trained on large sets of experimentally determined peptide:HLA binding data. We will here use algorithms developed by the Peters lab as part of the Immune Epitope Database (IEDB) project hosted at the La Jolla Institute for Allergy and Immunology.
+
+See: IEDB HLA binding prediction website http://tools.iedb.org/mhci/.
+
+# Section 3. Identifying tumor specific peptides
+Any peptide resulting from a mutation should be checked if it is present in other proteins of the human genome, which would mean that it is not specific to the tumor.
+
+Are any of your top ranked peptides unique to the tumor? Hint: Use NCBI-BLAST to check your top identified peptides against Human sequences in the NR database.
+
+```{r}
+
+sessionInfo()
+
+```
+
+
+
+
+
+
+
+
+
+
+
