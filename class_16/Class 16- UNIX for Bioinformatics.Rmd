@@ -1,0 +1,92 @@
+---
+title: "Class 16: UNIX for Bioinformatics"
+output: github_document
+---
+
+In this lecture we used UNIX on the command line to do bioinformatics. 
+Most of the exercise is done on the command line. 
+
+# Hands on Part One  is all in UNIX or on remote server
+
+# Hands-on Part 2 is all in UNIX
+
+# Hands-on Part 3
+
+Download the precomputed data
+```{r}
+
+download.file("https://raw.githubusercontent.com/ngs-docs/angus/17a0ba3b1d915de90a5b8bd1fbc1027eba47baf8/_static/shmlast/mouse.1.rna.fna.gz.x.cow.faa.crbl.csv.gz", "shmlast.csv")
+
+
+```
+
+Next, read the object in to R, and name it something that you might remember
+
+
+```{r}
+
+shmlast_out <- read.csv("shmlast.csv")
+
+```
+
+Now we can explore this data in R Studio
+```{r}
+
+head(shmlast_out)
+
+```
+
+What are the dimensions of this data?
+```{r}
+
+dim(shmlast_out)
+
+```
+
+
+Let’s do some data visualization to get a handle on what our blast output looked like: first, let’s look at the E_scaled column.
+
+```{r}
+
+hist(shmlast_out$E_scaled)
+
+
+```
+
+This tells us we have a lot of low e-values. 
+
+Now we will look at the bitscores:
+```{r}
+
+hist(shmlast_out$bitscore) 
+
+
+```
+This tells us the lengths of nucleotide alignment.
+
+
+We can also check the variable length. 
+```{r}
+
+hist(shmlast_out$q_len)
+
+```
+
+
+This is similar to bitscores. 
+
+Let's compare them.
+
+```{r}
+
+plot(shmlast_out$q_len, shmlast_out$bitscore)
+
+```
+
+```{r}
+
+sessionInfo()
+
+```
+
+
