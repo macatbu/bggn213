@@ -1,0 +1,218 @@
+---
+title: "Class 4: R Basics"
+output: github_document
+---
+
+In-Class exercise as a part of BGGN213 W19 at UCSD
+Instructor: Barry Grant
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Exercise 2: Simple Calculations
+
+Starting with attempting basic arthmetic 
+
+Can do addition:
+```{r }
+
+5 + 3
+
+```
+
+
+Subtraction:
+```{r }
+
+
+19  -4
+
+
+```
+
+Multiplication
+```{r}
+
+4 * 7 
+
+
+```
+
+
+Division 
+```{r}
+
+15 / 3
+
+
+
+```
+
+
+Exercise 3: Saving your answers using object assignmnet
+
+
+Assign the result of a calculation to an object.
+View object.
+```{r}
+
+x <- 2 * 7 * 9
+x
+
+# NOTE use <- and not = which will cause issues later
+
+```
+
+
+Exercise 4: Calling Functions 
+
+
+R has a lot of built in functions that can make calculations quick and easy. Here are a few examples. 
+
+```{r}
+
+seq(1,10)
+
+```
+
+If you don't know how a function works then you can use help(function) to get information about it
+
+```{r}
+
+help(seq)
+
+```
+
+Using additional arguments to seq
+
+```{r}
+
+seq(1,10, by =2)
+
+```
+
+Exercise 5: How to get help in R
+
+```{r}
+
+help(log)
+?log
+
+```
+
+If you don't know which function you need you can do the following
+
+```{r}
+
+help.search("cross tabulate")
+??"cross tabulate"
+
+```
+
+
+Each function has an example file
+
+```{r}
+
+example(log)
+
+```
+
+
+Excercise 6: Vectors and Indexing
+
+Vectors are a means for storing data in R
+
+```{r}
+
+length(3.1)
+
+```
+
+
+To combine values into vectors use c()
+
+```{r}
+
+x <- c(121, 4.56, 8.235)
+x
+
+```
+
+
+```{r}
+
+y <- c(898, 1.543, 705)
+y
+
+```
+
+
+Vectorization means that R loops over the values in vectors. Allows us to use arithmetic functions to vectors of the same length.
+
+```{r}
+
+x + y
+
+
+```
+
+```{r}
+
+x - y 
+
+```
+
+```{r}
+
+x / y 
+
+```
+
+```{r}
+
+sqrt(x)
+
+```
+
+```{r}
+
+round(sqrt(x), 3)
+
+```
+
+```{r}
+
+log(x)/2 + 1
+
+```
+
+Vector Indexing: We can use indexing to access specific values within a vector. 
+
+```{r}
+
+x <- c(56, 95.3, 0.4)
+x[2]
+
+```
+
+Index 1 responds to the first value in a vector 
+
+
+```{r}
+
+x[1]
+
+```
+
+Note on reproducibility
+
+Use sessionInfo() to record the version of R and the packages used to make sure everything is reproducible
+
+```{r}
+
+sessionInfo()
+
+```
+
