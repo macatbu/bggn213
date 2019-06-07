@@ -1,0 +1,236 @@
+---
+title: "Class 8: PCA exercise"
+output: github_document
+---
+
+
+
+# Principal component analysis with food in UK
+
+Read in our data file, view what we are working with 
+
+```{r}
+
+# set the index of the dataframe as the first row
+w <- read.csv("UK_foods.csv", row.names = 1)
+
+w
+
+```
+
+How many rows and columns 
+```{r}
+
+dim(w)
+
+```
+
+Checking the top of the data
+```{r}
+
+head(w)
+
+```
+
+Start visulaizing data
+
+```{r}
+
+barplot(as.matrix(w), beside=T, col=rainbow(nrow(w)))
+
+```
+
+Changing beside to false gives you a much different plot
+
+```{r}
+
+barplot(as.matrix(w), beside=F, col=rainbow(nrow(w)))
+
+```
+
+Generating pairwise plots to compare 
+```{r}
+
+pairs(w, col=rainbow(10), pch=16)
+ 
+
+```
+
+Principle Component Analysis makes comparing these multivariable datasets easier
+
+R makes this easy by using the prcomp() function
+
+```{r}
+
+pca <- prcomp( t(w))
+summary(pca)
+
+```
+
+This summary shows us that PC1 accounts for 67% of the sample variance.  
+
+We can plot principle components against each other:
+
+```{r}
+
+plot(pca$x[,1], pca$x[,2], xlab="PC1", ylab="PC2", xlim=c(-270,500))
+text(pca$x[,1], pca$x[,2], colnames(w))
+
+```
+
+We can jazz up this plot by adding colors to our labels
+
+```{r}
+
+my_cols <- c("orange", "red","blue", "green")
+
+plot(pca$x[,1], pca$x[,2], xlab="PC1", ylab="PC2", xlim=c(-270,500), col = my_cols)
+
+text(pca$x[,1], pca$x[,2], colnames(w), col= my_cols)
+
+```
+
+Below we can use the square of pca$sdev , which stands for “standard deviation”, to calculate how much variation in the original data each PC accounts for.
+
+```{r}
+
+v <- round( pca$sdev^2/sum(pca$sdev^2) * 100 )
+v
+
+```
+
+We can plot principle components by the amount of variance they contribute
+```{r}
+
+barplot(v, xlab="Principal Component", ylab="Percent Variation")
+
+```
+
+Can plot across one principle component (the one with the most variance) tell which of the variables are contributing the most
+
+```{r}
+
+## Lets focus on PC1 as it accounts for > 90% of variance 
+par(mar=c(8, 4, 4, 3))
+barplot( pca$rotation[,1], las=2, cex.names = .75)
+
+```
+
+Now do the same with PC2
+```{r}
+
+## Now plot PC2
+par(mar=c(8, 4, 4, 3))
+barplot( pca$rotation[,2], las=2, cex.names = .75)
+
+```
+
+We can also try to plot a biplot which are popular ways to represent PCA data
+
+```{r}
+
+biplot(pca)
+
+```
+
+# Section 2: PCA of RNA-seq data
+
+Read in RNA-seq data and perform the same functions to analyze it using PCA
+
+```{r}
+
+#read in data
+mydata <- read.csv("expression.csv", row.names = 1)
+
+
+head(mydata)
+
+```
+
+How big is our dataset?
+```{r}
+
+dim(mydata)
+
+```
+
+First we run prcomp() to start principle component analysis
+
+```{r}
+
+pca <- prcomp(t(mydata), scale=TRUE) 
+
+#attributes(pca)
+
+plot(pca$x[,1], pca$x[,2]) 
+
+```
+
+```{r}
+
+# Calculate variance for each PC
+
+pca.var <- pca$sdev^2 
+
+# Calculate percent variance 
+pca.var.per <- round(pca.var/sum(pca.var)*100, 1) 
+pca.var.per
+
+```
+
+Use these percent variances to make a scree plot
+
+```{r}
+
+barplot(pca.var.per, main="Scree Plot",
+ xlab="Principal Component", ylab="Percent Variation")
+
+
+```
+
+This shows us that pretty much all of the variation is in the first principle component, making analysis of 100 genes much easier. 
+
+We now want to make a prettier graph
+
+```{r}
+
+## A vector of colors for wt and ko samples
+colvec <- colnames(mydata)
+colvec[grep("wt", colvec)] <- "red"
+colvec[grep("ko", colvec)] <- "blue"
+
+plot(pca$x[,1], pca$x[,2], col=colvec, pch=16,
+     xlab=paste0("PC1 (", pca.var.per[1], "%)"),
+     ylab=paste0("PC2 (", pca.var.per[2], "%)"))
+
+text(pca$x[,1], pca$x[,2], labels = colnames(mydata), pos=c(rep(4,5), rep(2,5)))
+
+```
+
+
+Find the top 10 measurements (genes) that contribute most to pc1 in either direction (+ or -).
+
+
+```{r}
+
+loading_scores <- pca$rotation[,1]
+
+## Find the top 10 measurements (genes) that contribute
+## most to PC1 in either direction (+ or -)
+gene_scores <- abs(loading_scores) 
+gene_score_ranked <- sort(gene_scores, decreasing=TRUE)
+
+## show the names of the top 10 genes
+top_10_genes <- names(gene_score_ranked[1:10])
+top_10_genes 
+
+```
+
+
+
+```{r}
+
+sessionInfo()
+
+```
+
