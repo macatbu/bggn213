@@ -31,7 +31,7 @@ _photo by Ryan Szot Photography_
 
 - Class 16: [**UNIX for Bioinformatics SOON **]()
 
-- Class 17: [**Network Analysis SOON**]()
+- Class 17: [**Network Analysis**](https://github.com/macatbu/bggn213/blob/master/class_17/Class_17-_Network_Analysis.md)
 
 - Class 18: [**Cancer Genomics SOON**]()
 
