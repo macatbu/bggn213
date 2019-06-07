@@ -1,4 +1,4 @@
-Class 12: Bioinformatics in Drug Discovery
+Class 12: Structural Bioinformatics
 ================
 
 Section 1: In silico docking of drugs to HIV-1 protease
@@ -107,8 +107,8 @@ pdb <- read.pdb("1HEL")
 modes <- nma(pdb)
 ```
 
-    ##  Building Hessian...     Done in 0.022 seconds.
-    ##  Diagonalizing Hessian...    Done in 0.094 seconds.
+    ##  Building Hessian...     Done in 0.016 seconds.
+    ##  Diagonalizing Hessian...    Done in 0.089 seconds.
 
 ``` r
 plot(modes, sse=pdb)
