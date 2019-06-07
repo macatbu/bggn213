@@ -1,0 +1,110 @@
+---
+title: "Class 12: Structural Bioinformatics"
+output: github_document
+---
+
+# Section 1: In silico docking of drugs to HIV-1 protease 
+
+This exercise is a continuation of Class 11. We will be looking at the structure of HIV-1 protease. 
+
+```{r}
+
+library(bio3d)
+
+file.name <- get.pdb("1hsg")
+
+```
+
+Next use the read.pdb()function to read this PDB file into R so we can prepare it for further analysis
+
+```{r}
+
+hiv <-read.pdb(file.name)
+
+```
+
+What does this pdb file look like?
+```{r}
+
+hiv
+
+```
+
+What are the two non-protein values in this structure?
+HOH (127), MK1 (1)
+water! and probably a ligand
+
+
+We can separate all of these components by using trim.pdb()
+
+```{r}
+
+# separate the atoms associated with protein and ligand
+# save them separately 
+
+prot <- trim.pdb(hiv, "protein")
+lig <- trim.pdb(hiv, "ligand")
+
+# write them as pdb files to my local directory
+
+write.pdb(prot, file="1hsg_protein.pdb")
+write.pdb(lig, file="1hsg_ligand.pdb")
+
+```
+
+
+# Section 2: Docking ligands into HIV-1 protease 
+
+Load in our docking results and look at them
+```{r}
+#vina is having issues 
+
+res <- read.pdb("all.pdbqt", multi=TRUE)
+
+write.pdb(res, "results.pdb")
+
+```
+
+Calculate the root mean square distance between the docking results and the pdb file 
+```{r}
+
+
+ori <- read.pdb("ligand.pdbqt")
+
+rmsd(ori, res)
+
+```
+
+
+# Section 3: Exploring confirmational dynamics 
+
+Normal mode analysis is a common simulation technique to look at biomolecules 
+
+First we will download a pdb file of hen egg white lysozyme (PDB id 1hel)
+```{r}
+
+library(bio3d)
+
+pdb <- read.pdb("1HEL")
+
+modes <- nma(pdb)
+
+plot(modes, sse=pdb)
+
+```
+
+Use the function mktrj() to generate a trajectory PDB file by interpolating along a given normal mode:
+```{r}
+
+mktrj(modes, mode=7, file="nma_7.pdb")
+
+```
+
+This can be openend in VMD to look at it. 
+
+```{r}
+
+sessionInfo()
+
+```
+
