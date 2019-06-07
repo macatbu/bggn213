@@ -29,7 +29,7 @@ _photo by Ryan Szot Photography_
 
 - Class 15: [**Genome Annotation**](https://github.com/macatbu/bggn213/blob/master/class15_new/class15_gene_ontology.md)
 
-- Class 16: [**UNIX for Bioinformatics SOON **]()
+- Class 16: [**UNIX for Bioinformatics**](https://github.com/macatbu/bggn213/blob/master/class_16/Class_16-_UNIX_for_Bioinformatics.md)
 
 - Class 17: [**Network Analysis**](https://github.com/macatbu/bggn213/blob/master/class_17/Class_17-_Network_Analysis.md)
 
