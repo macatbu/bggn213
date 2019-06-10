@@ -181,8 +181,8 @@ plot(genes$Condition1, genes$Condition2, col = genes$State)
 
 ![](Class_5-_Data_Visualization_files/figure-markdown_github/unnamed-chunk-14-1.png)
 
-Using a dyanmics use of color in R plots
-========================================
+Dynamic use of color in R plots
+===============================
 
 First we will start by coloring by point density. Our data for this exercise is expression\_methylation.txt which contains data for gene body methylation, promoter methylation and gene expression.
 
