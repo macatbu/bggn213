@@ -27,7 +27,7 @@ _photo by Ryan Szot Photography_
 
 - Class 14: [**RNASeq**](https://github.com/macatbu/bggn213/blob/master/class14/Class_14-_RNA-seq.md)
 
-- Class 15: [**Genome Annotation**](https://github.com/macatbu/bggn213/blob/master/class15_new/class15_gene_ontology.md)
+- Class 15: [**Genome Annotation**](https://github.com/macatbu/bggn213/blob/master/class15/class15_gene_ontology.md)
 
 - Class 16: [**UNIX for Bioinformatics**](https://github.com/macatbu/bggn213/blob/master/class_16/Class_16-_UNIX_for_Bioinformatics.md)
 
