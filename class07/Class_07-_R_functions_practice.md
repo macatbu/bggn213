@@ -301,8 +301,8 @@ gene_intersect(x,y)
     ## [1,] "gene2" "gene2"
     ## [2,] "gene3" "gene3"
 
-Exercise to practice using packages in R. We practiced used ggplot2
-===================================================================
+Exercise to practice using packages in R. We practiced using ggplot2 to make more beautiful plots in R.
+=======================================================================================================
 
 First install like this: install.packages("BiocManager") install.packages("ggplot2") library("ggplot2")
 
