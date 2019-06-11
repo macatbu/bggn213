@@ -25,7 +25,8 @@ _photo by Ryan Szot Photography_
 
 - Class 13: [**Genome informatics and high throughput sequencing**](https://github.com/macatbu/bggn213/blob/master/class13/Class_13-_Genome_Informatics.md)
  
-- Class 14: [**RNASeq**](https://github.com/macatbu/bggn213/blob/master/class14/Class_14-_RNA-seq.md)
+- Class 14: [**RNASeq Part 1**](https://github.com/macatbu/bggn213/blob/master/class_14/Class_14-_RNA-seq.md)
+            [**RNASeq Part 2**](https://raw.githubusercontent.com/macatbu/bggn213/master/class_14/Class_14_-_Part_2.md)
 
 - Class 15: [**Genome Annotation**](https://github.com/macatbu/bggn213/blob/master/class15/class15_gene_ontology.md)
 
