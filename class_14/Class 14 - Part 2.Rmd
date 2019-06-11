@@ -1,0 +1,249 @@
+---
+title: "Class 14: Part 2"
+output: github_document
+---
+
+```{r }
+
+
+counts <- read.csv("data/airway_scaledcounts.csv", stringsAsFactors = FALSE)
+
+metadata <-  read.csv("data/airway_metadata.csv", stringsAsFactors = FALSE)
+
+```
+
+```{r}
+
+library("AnnotationDbi")
+library("org.Hs.eg.db")
+
+```
+
+
+#5 DESeq2 Analysis
+
+The previous exercises are not how you would go through the process of analyzing your data. Here we will use the package DEseq2 to do this work for us. 
+
+There are set formats for how this package takes in information to do the proper analysis
+
+
+First we are going to build our deseq dataset object we need for running the program 
+
+```{r}
+
+library(DESeq2)
+
+```
+
+Enter our countdata and metadata into deseq
+```{r}
+
+dds <- DESeqDataSetFromMatrix(countData=counts, 
+                              colData=metadata, 
+                              design=~dex, 
+                              tidy=TRUE)
+dds
+
+```
+
+Run DESeq2
+```{r}
+
+dds <- DESeq(dds)
+
+
+```
+
+Get our results 
+```{r}
+
+res <- results(dds)
+as.data.frame(res)
+
+```
+
+Get an overview of our analysis
+```{r}
+
+summary(res)
+
+```
+
+Save the results that have a pvalue less than .05
+```{r}
+
+res05 <- results(dds, alpha = 0.05)
+
+summary(res05)
+
+```
+
+Save only results with p value less than .01
+```{r}
+
+res01 <- results(dds, alpha = 0.01)
+
+dim(res01)
+
+
+```
+
+Practice adding annotations to res01 with mapIds()
+```{r}
+
+res01$uniprot <- mapIds(org.Hs.eg.db,
+                     keys=row.names(res01), 
+                     
+                     keytype="ENSEMBL",     
+                     
+                     column="UNIPROT",     
+                     
+                     multiVals="first")
+
+```
+
+Arrange and view results by p value
+```{r}
+
+ord <- order( res01$padj )
+
+head(res01[ord,])
+
+```
+
+Write out this data to a spreadsheet 
+```{r}
+
+write.csv(res01[ord,], "signif01_results.csv")
+
+
+```
+
+
+# Section 6: Data Visualization
+
+Create a volcano plot for my gene expression data
+```{r}
+
+plot( res$log2FoldChange,  -log(res$padj), 
+      xlab="Log2(FoldChange)",
+      ylab="-Log(P-value)")
+
+```
+
+
+Add some lines with the abline() function and color (with a custom color vector) highlighting genes that have padj<0.05 and the absolute log2FoldChange>2.
+
+```{r}
+
+plot( res$log2FoldChange,  -log(res$padj), 
+ ylab="-Log(P-value)", xlab="Log2(FoldChange)")
+
+# Add some cut-off lines
+abline(v=c(-2,2), col="darkgray", lty=2)
+abline(h=-log(0.05), col="darkgray", lty=2)
+
+```
+
+To color the points we will setup a custom color vector indicating transcripts with large fold change and significant differences between conditions:
+
+```{r}
+
+mycols <- rep("gray", nrow(res))
+mycols[ abs(res$log2FoldChange) > 2 ]  <- "red" 
+
+inds <- (res$padj < 0.01) & (abs(res$log2FoldChange) > 2 )
+mycols[ inds ] <- "blue"
+
+# Volcano plot with custom colors 
+plot( res$log2FoldChange,  -log(res$padj), 
+ col=mycols, ylab="-Log(P-value)", xlab="Log2(FoldChange)" )
+
+# Cut-off lines
+abline(v=c(-2,2), col="gray", lty=2)
+abline(h=-log(0.1), col="gray", lty=2)
+
+
+```
+
+
+Another way using the package Enhanced Volcano
+
+```{r}
+
+# load this package 
+library(EnhancedVolcano)
+
+```
+
+```{r}
+
+#reformat the data for plotting 
+
+to_plot <- as.data.frame(res)
+to_plot$symbol <- mapIds(org.Hs.eg.db, 
+                   keys=row.names(to_plot),
+                   keytype="ENSEMBL",
+                   column="SYMBOL",
+                   multiVals="first")
+
+```
+
+
+```{r}
+EnhancedVolcano(to_plot,
+    lab = to_plot$symbol,
+    x = 'log2FoldChange',
+    y = 'pvalue')
+
+```
+
+# Section 7: Plotting counts 
+
+DESeq2 offers a function called plotCounts() that takes a DESeqDataSet that has been run through the pipeline, the name of a gene, and the name of the variable in the colData that you're interested in, and plots those values. See the help for ?plotCounts. Let's first see what the gene ID is for the CRISPLD2 gene using:
+
+```{r}
+
+i <- grep("CRISPLD2", res01$symbol)
+res01[i,]
+rownames(res01[i,])
+
+```
+
+```{r}
+
+plotCounts(dds, gene="ENSG00000103196", intgroup="dex")
+
+```
+
+```{r}
+
+#Return the data do not plot this time
+d <- plotCounts(dds, gene="ENSG00000103196", intgroup="dex", returnData=TRUE)
+
+head(d)
+
+```
+
+Create a boxplot with this 
+```{r}
+
+boxplot(count ~ dex , data=d)
+
+```
+
+We can plot this with ggplot2 as well to make it prettier
+
+```{r}
+
+library(ggplot2)
+ggplot(d, aes(dex, count)) + geom_boxplot(aes(fill=dex)) + scale_y_log10() + ggtitle("CRISPLD2")
+
+```
+
+```{r}
+
+sessionInfo()
+
+```
+

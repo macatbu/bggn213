@@ -1,0 +1,283 @@
+---
+title: "Class 14: RNA-seq"
+output: github_document
+---
+
+# Section 1: Introduction
+
+In this exercise we are going to analyze data from a published RNA-seq dataset. In this dataset they looked at RNA-seq gene expression data in 4 airway smooth muscle cells with dexamethasone glucocorticoid and without. 
+ 
+First install relevant packages 
+
+```{r}
+
+#install.packages("BiocManager")
+#BiocManager::install()
+
+#BiocManager::install("DESeq2")
+
+```
+
+Then load the relevant packages 
+
+```{r}
+
+library(BiocManager)
+library(DESeq2)
+
+```
+
+ 
+# Section 2: Import data
+
+First read.csv() function to read these count data and metadata files.
+
+```{r }
+
+
+counts <- read.csv("data/airway_scaledcounts.csv", stringsAsFactors = FALSE)
+
+metadata <-  read.csv("data/airway_metadata.csv", stringsAsFactors = FALSE)
+
+```
+
+View the data 
+
+```{r }
+
+head(counts)
+
+nrow(counts)
+
+
+```
+
+What does the metadata have in it?
+```{r}
+
+head(metadata)
+
+```
+
+# Section 3: Go through steps of differential gene expression (normally will do DESEq2)
+```{r}
+
+# pluck out the 4 cell line names that are controls
+controls = (metadata$dex == "control")
+control_lines = metadata$id[controls]
+control_lines
+
+#control.mean = rowSums(counts[, control_lines$id])/4
+
+#head(control_counts)
+```
+
+Find the samples that are controls, calculate counts per gene for these samples. 
+
+```{r}
+
+control <- metadata[metadata[,"dex"]=="control",]
+
+control.mean <- rowSums( counts[ ,control$id] )/length(control$id)
+
+names(control.mean) <- counts$ensgene
+
+```
+
+Do the same thing with the treated samples 
+```{r}
+
+treated <- metadata[metadata[,"dex"]=="treated",]
+
+treated.mean <- rowSums( counts[ ,treated$id] )/length(treated$id)
+
+names(treated.mean) <- counts$ensgene
+
+
+```
+
+
+Combine these together into a new data.frame called 'meancounts'
+
+```{r}
+
+meancounts <- data.frame(control.mean, treated.mean)
+meancounts
+
+```
+
+Creating a scatter plot comparing the mean of treated sample versus the mean of control samples. 
+
+```{r}
+
+plot(control.mean, treated.mean)
+
+```
+
+Plot the log of each instead
+```{r}
+
+plot(log(control.mean), log(treated.mean))
+
+```
+
+
+Here we calculate log2foldchange, add it to our meancounts data.frame. Log2foldchange is frequently used to compare expression between treated and control.
+
+```{r}
+
+meancounts$log2fc <- log2(meancounts[,"treated.mean"]/meancounts[,"control.mean"])
+
+head(meancounts)
+
+```
+
+When we look at our dataset we have values that do not make sense. We see NaN from dividing by zero and try to take the log. The -Inf is returned when you try to take the log of zero. It turns out that there are a lot of genes with zero expression. Filter our data to remove these genes. 
+
+```{r}
+
+# find the zeros
+zero.vals <- which(meancounts[,1:2]==0, arr.ind=TRUE)
+
+# remove the zeros
+to.rm <- unique(zero.vals[,1])
+mycounts <- meancounts[-to.rm,]
+
+# check to see if it worked
+head(mycounts)
+
+```
+
+A log fold change of absolute value two is considered to be a significant enough change. We will pull these genes out of our data set. 
+
+```{r}
+
+up.ind <- mycounts$log2fc > 2
+down.ind <- mycounts$log2fc < (-2)
+
+```
+
+how many upregulated?
+```{r}
+
+sum(up.ind)
+
+```
+
+how many downregulated?
+```{r}
+
+sum(down.ind)
+
+```
+
+# Section 4: Adding annotation data 
+
+Our data only identifies genes by Ensembl IDs, we want to add additional annotation data to make our results more understandable 
+
+Here we will read in an excel file of annotation information:
+
+```{r}
+
+anno <- read.csv("data/annotables_grch38.csv")
+
+head(anno)
+
+```
+
+Ideally we want this annotation data mapped (or merged) with our mycounts data. 
+```{r}
+
+merge(x = mycounts, y= anno, by.x =  "row.names", by.y = "ensgene")
+
+```
+
+You can also use Bioconductor annotation packages. Here we load the AnnotationDbi package and the annotation package org.Hs.eg.db.
+
+```{r}
+
+library("AnnotationDbi")
+library("org.Hs.eg.db")
+
+```
+
+Look at the types of annotations that are available
+```{r}
+
+columns(org.Hs.eg.db)
+
+```
+
+We can use the mapIds() function to add individual columns to our results table. 
+keys is  where our genenames are located 
+keytype is the type of annotation our genenames are in
+column tells us the format from annotation file we are adding
+
+```{r}
+
+mycounts$symbol <- mapIds(org.Hs.eg.db,
+                     keys=row.names(mycounts), 
+      
+                     keytype="ENSEMBL",        
+                     
+                     column="SYMBOL",          
+                    
+                     multiVals="first")
+
+```
+
+```{r}
+
+# check if our column added 
+
+head(mycounts)
+
+```
+
+Repeat the mapIds and this time add ENTREZID
+```{r}
+
+mycounts$entrez <- mapIds(org.Hs.eg.db,
+                     keys=row.names(mycounts), 
+                     
+                     keytype="ENSEMBL",        
+                     
+                     column="ENTREZID",   
+                     
+                     multiVals="first")
+
+```
+
+Do the same thing but add UNIPROT annotations
+```{r}
+
+mycounts$uniprot <- mapIds(org.Hs.eg.db,
+                     keys=row.names(mycounts), 
+                     
+                     keytype="ENSEMBL",     
+                     
+                     column="UNIPROT",     
+                     
+                     multiVals="first")
+
+```
+
+```{r}
+
+# did it work? yes! 
+head(mycounts)
+
+```
+
+Check our upregulated data
+```{r}
+
+#View(mycounts[up.ind,])
+
+```
+
+
+
+
+
+

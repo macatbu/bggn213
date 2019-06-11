@@ -1,0 +1,305 @@
+---
+title: "Deseq2"
+output: github_document
+---
+
+Begin a new R script and use the read.csv() function to read these count data and metadata files.
+
+
+```{r }
+
+
+counts <- read.csv("data/airway_scaledcounts.csv", stringsAsFactors = FALSE)
+metadata <-  read.csv("data/airway_metadata.csv", stringsAsFactors = FALSE)
+```
+
+Now, take a look at each.
+
+
+
+```{r }
+head(counts)
+nrow(counts)
+
+
+```
+
+
+
+```{r}
+#head(metadata)
+
+# pluck out the 4 cell line names that are controls
+controls = (metadata$dex == "control")
+control_lines = metadata$id[controls]
+control_lines
+
+#control.mean = rowSums(counts[, control_lines$id])/4
+
+#head(control_counts)
+```
+
+```{r}
+head(metadata)
+```
+
+```{r}
+
+```
+
+Lets perform some exploratory differential gene expression analysis. Note: this analysis is for demonstration only. NEVER do differential expression analysis this way!
+
+```{r}
+control <- metadata[metadata[,"dex"]=="control",]
+control.mean <- rowSums( counts[ ,control$id] )/length(control$id)
+names(control.mean) <- counts$ensgene
+```
+
+```{r}
+treated <- metadata[metadata[,"dex"]=="treated",]
+treated.mean <- rowSums( counts[ ,treated$id] )/length(treated$id)
+names(treated.mean) <- counts$ensgene
+
+
+```
+
+
+Combine these togwther into a new data.frame called 'meancounts'
+
+```{r}
+meancounts <- data.frame(control.mean, treated.mean)
+meancounts
+
+```
+
+```{r}
+
+plot(log(control.mean), log(treated.mean))
+```
+
+
+Here we calculate log2foldchange, add it to our meancounts data.frame and inspect the results either with the head() or the View() function for example.
+
+
+```{r}
+meancounts$log2fc <- log2(meancounts[,"treated.mean"]/meancounts[,"control.mean"])
+head(meancounts)
+```
+
+
+There are a couple of “weird” results. Namely, the NaN ("not a number") and -Inf (negative infinity) results.
+
+The NaN is returned when you divide by zero and try to take the log. The -Inf is returned when you try to take the log of zero. It turns out that there are a lot of genes with zero expression. Let’s filter our data to remove these genes. Again inspect your result (and the intermediate steps) to see if things make sense to you
+```{r}
+zero.vals <- which(meancounts[,1:2]==0, arr.ind=TRUE)
+
+to.rm <- unique(zero.vals[,1])
+mycounts <- meancounts[-to.rm,]
+head(mycounts)
+```
+
+A common threshold used for calling something differentially expressed is a log2(FoldChange) of greater than 2 or less than -2. Let’s filter the dataset both ways to see how many genes are up or down-regulated.
+
+```{r}
+up.ind <- mycounts$log2fc > 2
+down.ind <- mycounts$log2fc < (-2)
+
+sum(up.ind)
+sum(down.ind)
+
+```
+
+Adding annotation data 
+
+```{r}
+anno <- read.csv("data/annotables_grch38.csv")
+head(anno)
+```
+
+```{r}
+
+
+merge(x = mycounts, y= anno, by.x =  "row.names", by.y = "ensgene")
+
+
+
+
+```
+
+In cases where you don't have a preferred annotation file at hand you can use other Bioconductor packages for annotation.
+
+Bioconductor's annotation packages help with mapping various ID schemes to each other. Here we load the AnnotationDbi package and the annotation package org.Hs.eg.db.
+
+```{r}
+#columns(org.Hs.eg.db)
+
+```
+
+We can use the mapIds() function to add individual columns to our results table. We provide the row names of our results table as a key, and specify that keytype=ENSEMBL. The column argument tells the mapIds() function which information we want, and the multiVals argument tells the function what to do if there are multiple possible values for a single input value. Here we ask to just give us back the first one that occurs in the database.
+
+```{r}
+mycounts$symbol <- mapIds(org.Hs.eg.db,
+                     keys=row.names(mycounts), # Our genenames
+                     keytype="ENSEMBL",        # The format of our genenames
+                     column="SYMBOL",          # The new format we want to add
+                     multiVals="first")
+```
+
+```{r}
+head(mycounts)
+```
+
+```{r}
+mycounts$entrez <- mapIds(org.Hs.eg.db,
+                     keys=row.names(mycounts), # Our genenames
+                     keytype="ENSEMBL",        # The format of our genenames
+                     column="ENTREZID",          # The new format we want to add
+                     multiVals="first")
+```
+
+```{r}
+
+mycounts$uniprot <- mapIds(org.Hs.eg.db,
+                     keys=row.names(mycounts), # Our genenames
+                     keytype="ENSEMBL",        # The format of our genenames
+                     column="UNIPROT",          # The new format we want to add
+                     multiVals="first")
+
+```
+
+```{r}
+head(mycounts)
+```
+
+```{r}
+View(mycounts[up.ind,])
+```
+
+
+#5 DESeq2 Analysis
+The previous exercises are not how you would go through the process of analyzing your data. Here we will use the package DEseq2 to do this work for us. 
+
+there are set formats for how this package takes in information to do the proper analysis
+
+
+first we are going to build our deseq dataset object we need for running the program 
+
+```{r}
+dds <- DESeqDataSetFromMatrix(countData=counts, 
+                              colData=metadata, 
+                              design=~dex, 
+                              tidy=TRUE)
+dds
+```
+
+```{r}
+dds <- DESeq(dds)
+
+
+```
+
+```{r}
+res <- results(dds)
+as.data.frame(res)
+```
+
+```{r}
+summary(res)
+```
+
+
+```{r}
+res05 <- results(dds, alpha = 0.05)
+summary(res05)
+```
+
+```{r}
+plot( res$log2FoldChange,  -log(res$padj), 
+      xlab="Log2(FoldChange)",
+      ylab="-Log(P-value)")
+
+
+```
+
+
+To make this more useful we can add some guidelines (with the abline() function) and color (with a custom color vector) highlighting genes that have padj<0.05 and the absolute log2FoldChange>2.
+```{r}
+plot( res$log2FoldChange,  -log(res$padj), 
+ ylab="-Log(P-value)", xlab="Log2(FoldChange)")
+
+# Add some cut-off lines
+abline(v=c(-2,2), col="darkgray", lty=2)
+abline(h=-log(0.05), col="darkgray", lty=2)
+
+
+```
+
+To color the points we will setup a custom color vector indicating transcripts with large fold change and significant differences between conditions:
+```{r}
+mycols <- rep("gray", nrow(res))
+mycols[ abs(res$log2FoldChange) > 2 ]  <- "red" 
+
+inds <- (res$padj < 0.01) & (abs(res$log2FoldChange) > 2 )
+mycols[ inds ] <- "blue"
+
+# Volcano plot with custom colors 
+plot( res$log2FoldChange,  -log(res$padj), 
+ col=mycols, ylab="-Log(P-value)", xlab="Log2(FoldChange)" )
+
+# Cut-off lines
+abline(v=c(-2,2), col="gray", lty=2)
+abline(h=-log(0.1), col="gray", lty=2)
+
+
+
+```
+
+
+
+Another way
+
+```{r}
+#EnhancedVolcano(res,
+#    lab = res$symbol,
+#    x = 'log2FoldChange',
+#    y = 'pvalue')
+
+```
+
+```{r}
+#i <- grep("CRISPLD2", resSig01$symbol)
+resSig01[i,]
+rownames(resSig01[i,])
+```
+
+```{r}
+plotCounts(dds, gene="ENSG00000103196", intgroup="dex")
+
+```
+
+```{r}
+# Return the data
+d <- plotCounts(dds, gene="ENSG00000103196", intgroup="dex", returnData=TRUE)
+head(d)
+```
+
+```{r}
+boxplot(count ~ dex , data=d)
+```
+
+```{r}
+library(ggplot2)
+ggplot(d, aes(dex, count)) + geom_boxplot(aes(fill=dex)) + scale_y_log10() + ggtitle("CRISPLD2")
+```
+
+```{r}
+sessionInfo()
+```
+
+
+
+
+```{r}
+
+```
+
